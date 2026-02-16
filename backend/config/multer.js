@@ -52,79 +52,82 @@ const storage = multer.diskStorage({
      * @param {Object} file - Archivo que se esta subiendo
      * @param {Function} cb - Callback que se llama con (error, filename)
      */
-    /**
-     * Filtro para validar el tipo de archivo
-     * solo permire imagenes (jpg, jpeg, png, gif)
-     * 
-     * @param {Object} req - Objeto de peticion HTTP
-     * @param {Object} file - Archivo que se esta subiendo
-     * @param {Function} cb - Callback que se llama con (error, acceptFile)
-     */
-    const filefilter = ( req, file,cb) => {
-        //Tipos Mime permitidos para imagenes
-        const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    
-
-        //verificar si el tipo de archivo está en la lista permitida
-        if (allowedMimeTypes.includes(file.mimetype)){
-            //cb (null,true)-> aceptar el archivo
-            cb(null,true);
-        } 
-        else{
-            //cb (error)->rechazar el archivo
-            cb(new Error('Solo se permite imagenes (JPG. JPEG, PNG, GIF)'), false);
-        }
-    },
-    filename:function (req, file, cb) {
+    filename: function (req, file, cb) {
         //Genera nombre unico usando timestamp + nombre original
         //Date.now() genera un tiemstamp unico 
         //path.extname() extrae la extension dek archivo (.jpg, .png, etc)
         const uniqueName = Date.now() + '-' + file.originalName;
         cb(null, uniqueName);
-    },
-})
+    }
+});
+
 /**
- * configurar multer con las opciones definidas
+ * Filtro para validar el tipo de archivo
+ * solo permire imagenes (jpg, jpeg, png, gif)
+ * 
+ * @param {Object} req - Objeto de peticion HTTP
+ * @param {Object} file - Archivo que se esta subiendo
+ * @param {Function} cb - Callback que se llama con (error, acceptFile)
+ */
+const fileFilter = (req, file, cb) => {
+    //Tiempos Mime permitidos para imagenes
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+    //Verificar si el tipo de archivo esta en la lista permitida
+    if(allowedMimeTypes.includes(file.mimetype)) {
+        // cb(null, true) -> aceptar el archivo
+        cb(null, true);
+    } else {
+        //cb(error) -> rechazar el archivo
+        cb(new Error('Solo permite imagenes (JPEG, JPG, PNG, GIF)'), false);
+    }
+};
+
+/**
+ * Configurar multer con las opciones definidas
  */
 
 const upload = multer({
     storage: storage,
-    filefilter: fileFilter,
-    limits:{
-        //limite de tamaño dek archivo en bytes 
-        //por defecto 5MB (5 *1024 ) 5242880  bytes
-        fileSize:parseInt(process.env.MAX_FILE_SIZE) || 5242880
+    fileFilter: fileFilter,
+    limist: {
+        //Limite de tamaño del archino en bytes
+        //por defecto 5MB (5 * 1024) 5242800 bytes
+        fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5242800
     }
 });
-/*
-*Funcion para eliminar el archivo del servidor
-*Util cuando se actualiza o se elimnina el productyo
-*
-*@param{string} filename=mombre del archivo
-*/
 
-const deletefile = (filename) => {
-    try{
-        //Cpnstruir la ruta completa deñ archico
-        const filePath= path.join(uploadPath, filename)
+/**
+ * Funcion para eliminar el archivo del servidor
+ * Util cuando se actualiza o elimina el producto
+ * 
+ * @param {String} filename - nombre del archivo a eliminar
+ * @returns {Boolean} - true si se elimino, false si hubo un error 
+ */
 
-        //verificar si el archivo existe
-        if (fs.existsSync(filePath)){
+const deleteFile = (filename) => {
+    try {
+        //Construit la ruta completa del archivo
+        const filePath = path.join(uploadPath, filename);
 
+        //Verificar si  el archivo existe 
+        if (fs.existsSync(filePath)) {
+            //Eliminar el archivo
             fs.unlinkSync(filePath);
             console.log(`Archivo eliminado: ${filename}`);
-                return true;
-        }else{
-            console.warn(`Archino no encontrado para eliminar:${filename}`);
+            return true;
+        } else {
+            console.log(`Archivo no escontrado: ${filename}`);
+            return false;
         }
-    }catch(error){
-        console.error('Error al eliminar el archivo;', error.message);
+    } catch (error) {
+        console.error('Error al eliminar archivo:', error.message);
         return false;
     }
-}
+}; 
 
-//Exportar configuracion de multer y funcion de eliminacion
-module.exports={
+// Exportar configuracion de multer y funcion de eliminacion
+module.exports = {
     upload,
-    deletefile
-}
+    deleteFile
+};
