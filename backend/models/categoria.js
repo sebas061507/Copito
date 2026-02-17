@@ -35,7 +35,7 @@ const Categoria = sequelize.define('Categoria', {
             },
             len: {
                 args: [2, 100],
-                msg: 'El nombre de la categoria debe tener netre 2 y 100 caracteres'
+                msg: 'El nombre de la categoria debe tener entre 2 y 100 caracteres'
             }
         }
     },
@@ -80,7 +80,7 @@ const Categoria = sequelize.define('Categoria', {
 
                 // Importar modelos (aqui para evitat dependecias circulares)
                 const Subcategoria = require('./Subcategoria');
-                const Producto = require('./Producto');
+                const Producto = require('./producto');
 
                 try {
                     // Paso 1 desactivar las subcategorias de esta categoria

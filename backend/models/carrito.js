@@ -183,7 +183,7 @@ const Carrito = sequelize.define(
  * @returns {number} - Subtotal de productos asociados a esta subcategoría (precio unitario * cantidad)
  */
 carrito.prototype.calcularSubtotal = function () {
-  return parseFloa(this.precioUnitario) * this.cantidad;
+  return parseFloat(this.precioUnitario) * this.cantidad;
 };
 
 /**
@@ -194,7 +194,7 @@ carrito.prototype.calcularSubtotal = function () {
 carrito.prototype.actualizarCantidad = async function (nuevaCantidad) {
   const producto = require("./producto");
 
-  const prducto = await producto.findByPk(this.productoId);
+  const producto = await producto.findByPk(this.productoId);
 
   if (!prducto.hayStock(nuevaCantidad)) {
     throw new Error(
