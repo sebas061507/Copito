@@ -300,7 +300,7 @@ Pedido.prototype.obtenerDetalle = async function (){
  * @returns {Promise<Array>} Pedidos filtrados 
  */
 Pedido.obtenerPedidosPorEstado = async function (estado) {
-  const Usuario = require('./usuario');
+  const Usuario = require('./Usuario');
   return await this.findAll({
     where: { estado },
     include:[

@@ -17,9 +17,7 @@ const { table, timeStamp } = require("console");
  * En este caso, se define un modelo llamado "Categoria" con los campos id (clave primaria, auto-incremental), nombre (cadena de texto, no nulo) y descripcion (cadena de texto).
  */
 
-const Carrito = sequelize.define(
-  "carrito",
-  {
+const Carrito = sequelize.define("carrito",{
     //campos de la tabla carritos
     //Id Identificador único del carrito, es la clave primaria y se auto-incrementa
     id: {
@@ -159,7 +157,7 @@ const Carrito = sequelize.define(
 
         if (itemcarrito.changed("cantidad")) {
           const producto = require("./producto");
-          const prducto = await producto.findByPk(itemcarrito.productoId);
+          const producto = await producto.findByPk(itemcarrito.productoId);
           if (!prducto) {
             throw new Error(
               "El producto asociado a este item de carrito no existe", //Mensaje de error personalizado si se intenta actualizar un item de carrito con un producto que no existe
@@ -182,7 +180,7 @@ const Carrito = sequelize.define(
  * Método de instancia para obtener el número de subcategorías activas asociadas a esta categoría
  * @returns {number} - Subtotal de productos asociados a esta subcategoría (precio unitario * cantidad)
  */
-carrito.prototype.calcularSubtotal = function () {
+Carrito.prototype.calcularSubtotal = function () {
   return parseFloat(this.precioUnitario) * this.cantidad;
 };
 
@@ -191,7 +189,7 @@ carrito.prototype.calcularSubtotal = function () {
  * @param {number} nuevaCantidad - La nueva cantidad que se desea establecer para este item de carrito
  * @returns {Promise} Item actualizado con la nueva cantidad si la actualización fue exitosa, o un error si la nueva cantidad no es válida o si no hay suficiente stock disponible del producto asociado.
  */
-carrito.prototype.actualizarCantidad = async function (nuevaCantidad) {
+Carrito.prototype.actualizarCantidad = async function (nuevaCantidad) {
   const producto = require("./producto");
 
   const producto = await producto.findByPk(this.productoId);
@@ -211,12 +209,12 @@ carrito.prototype.actualizarCantidad = async function (nuevaCantidad) {
  * @returns {Promise} Un array de items de carrito con la información del producto asociado a cada item, o un error si no se encuentra ningún item de carrito para el usuario proporcionado.
  */
 carrito.obtenerCarritoUsuario = async function (usuarioId) {
-  const producto = require("./producto");
+  const Producto = require("./producto");
   return await carrito.findAll({
     where: { usuarioId },
     include: [
       {
-        model: producto,
+        model: Producto,
         as: 'producto'
       },
     ],
@@ -244,7 +242,7 @@ carrito.calcularTotalCarrito = async function (usuarioId) {
  * @param {number} usuarioId
  * @return {Promise<number>}
  */
-Carrito.vaciarCarrito = async function (paramusuarioId) {
+carrito.vaciarCarrito = async function (paramusuarioId) {
     return await this.detroy({
         where: { usuarioId }
     });
