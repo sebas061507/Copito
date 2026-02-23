@@ -29,7 +29,7 @@ const getCategorias = async (req, res) => {
         
         // Opciones de consulta
         const opciones = {
-            orde:[['nombre', 'ASC']] // ordenar de manera alfabetica
+            order:[['nombre', 'ASC']] // ordenar de manera alfabetica
 
         };
         
@@ -40,7 +40,7 @@ const getCategorias = async (req, res) => {
 
         // incluir Subcategorias si se solicita
 
-        if (IncluirSubcategorias = 'treu'){
+        if (IncluirSubcategorias = 'true'){
             opciones.include == [{
                 model: Subcategoria,
                 as: 'subcategorias', //campos del alias para la relacion
