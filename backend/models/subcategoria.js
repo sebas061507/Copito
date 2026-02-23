@@ -111,7 +111,7 @@ const Subcategoria = sequelize.define('Subcategoria', {
          * verifica que la categoria padre este activa
          */
         beforeCreate: async (subcategoria) => {
-            const Categoria = require('./categoria'); //No lee la ruta con C nayuscula
+            const Categoria = require('./Categoria'); //No lee la ruta con C nayuscula
 
             //Buscar categoria padre
             const categoria = await Categoria.findByPk(subcategoria.categoriaId);
@@ -176,7 +176,7 @@ Subcategoria.prototype.contarProductos = async function() {
  * @param {Promise<Categoria>} - categoria padre
  */
 Subcategoria.prototype.obtenerCategoria = async function() {
-    const Categoria = require('./categoria'); //No lee la ruta con C nayuscula
+    const Categoria = require('./Categoria'); //No lee la ruta con C nayuscula
     return await Categoria.findByPk(this.categoriaId);
 };
 //Exportar modelo Subcategoria

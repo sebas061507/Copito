@@ -180,7 +180,7 @@ const Producto = sequelize.define('Producto', {
          * valida que la subcategoria y que la categoria este activa
          */
         beforeCreate: async (producto) => {
-            const Categoria = require('./categoria'); //No lee la ruta con C nayuscula
+            const Categoria = require('./Categoria'); //No lee la ruta con C nayuscula
             const Subcategoria = require('./Subcategoria');
 
             //Buscar subcategoria padre
