@@ -150,11 +150,11 @@ const crearCategoria = async (req, res) =>{
 
         }
         // Validacion 2: categoria duplicada
-        const categoriaExistente = await categoria.findOne({where: (nombre)});
+        const categoriaExistente = await Categoria.findOne({where: (nombre)});
         if (categoriaExistente){
             return res.status(400).json({
                 success:false,
-                message: `Ya existe una categoria con el nombre"${nombre}`
+                message: `Ya existe una categoria con el nombre "${nombre}"`
             });
         }
 
@@ -168,7 +168,7 @@ const crearCategoria = async (req, res) =>{
         //Respuesta exitosa
         res.status(201).json({
             success:true,
-            message: ' Categoria creada exitosmente',
+            message: ' Categoria creada exitosamente',
             data:{
                 categoria: nuevaCategoria
             }
@@ -215,7 +215,7 @@ const actualizaCategoria = async (req, res) =>{
         
         // validacion 1 si se camabia el nombre verificar que no exista
         if (nombre && nombre !== categoria.nombre){
-            const categoriaConMismoNombre = await categoria.findOne({ where:{nombre}});
+            const categoriaConMismoNombre = await Categoria.findOne({ where:{nombre}});
             if ( categoriaConMismoNombre) {
                 return res.status(400).json({
                     success:false,
@@ -230,7 +230,7 @@ const actualizaCategoria = async (req, res) =>{
         if (activo!==undefined) categoria.activo = activo;
 
         // guardar cambios
-        await categoria.save();
+        await Categoria.save();
 
         // respuesta exitosa
         res.json({
@@ -262,7 +262,7 @@ const actualizaCategoria = async (req, res) =>{
  * Activar/Desactivar categoria
  * PATCH/api/admin/categorias/:id/estado
  * 
- * Al desactivar una categoria se desacctican tosa las subcategorias relacionadas
+ * Al desactivar una categoria se desactivan todas las subcategorias relacionadas
  * al desactivar una subcategoria se desactivan todos los productos
  * 
  * @param {Object} req request Express
@@ -283,7 +283,7 @@ const toggleCategoria = async (req, res) => {
             });
         }
         
-        //Alternaar estado activo
+        //Alternar estado activo
         const nuevoEstado = !categoria.activo;
         categoria.activo = nuevoEstado;
 
@@ -291,11 +291,11 @@ const toggleCategoria = async (req, res) => {
         await categoria.save();
 
         //contar cuantos registros se afectaron
-        const subcategoriaAfectadas = await
+        const subcategoriasAfectadas = await
         Subcategoria.count ({where:{categoriaId:id}
         });
 
-        const productoAfectadas = await producto.count ({where:{categoriaId:id}
+        const productosAfectados = await Producto.count ({where:{categoriaId:id}
         });
 
         //Respuesta exitosa
@@ -306,8 +306,8 @@ const toggleCategoria = async (req, res) => {
                 categoria,
                 afectados:{
                     Subcategoria:
-                    subcategoriaAfectadas,
-                    productos: productoAfectadas
+                    subcategoriasAfectadas,
+                    productos: productosAfectados
                 }
             }
         });
@@ -390,7 +390,7 @@ const eliminarCategoria = async (req, res) => {
  * obtener estadisticas de una categoria
  * GET/ api/ admin/ categorias/ :id/ estadisticas
  * retorna
- * toptal de subcategorias activas/ inactivas
+ * total de subcategorias activas/ inactivas
  * total de productos activos/ inactivos
  * valor total del inventario
  * stock total
@@ -462,8 +462,8 @@ const getEstadisticasCategorias = async(req, res) =>{
                     },
                     productos: {
                         total: totalProductos,
-                        activas: productosActivos,
-                        inactivas: totalProductos - productosActivos
+                        activos: productosActivos,
+                        inactivos: totalProductos - productosActivos
                     },
                     inventario: {
                         stockTotal,

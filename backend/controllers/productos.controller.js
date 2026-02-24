@@ -1,6 +1,6 @@
 /**
- * Controlador de subcategorias
- * maneja las operaciones crud y activa y/o desactiva subcategorias
+ * Controlador de productos
+ * maneja las operaciones crud y activa y/o desactiva productoss
  * solo para administrador
  */
 
@@ -13,19 +13,19 @@ const Producto = require ('../models/producto');
 
 
 /**
- * obtener todas las subcategorias
+ * obtener todos los productos
  * query params
- * categoriaId: filtrar por categoria
+ * subcategoriaId: filtrar por subcategoria
  * Activo true/false (filtar por estado)
- * incluir categoria true / false (incluir categorias relacionadas)
+ * incluir subcategoria true / false (incluir subcategorias relacionadas)
  * 
  * @param {Object} req request expre
  * @param {Object} res response express
  */
 
-const getSubcategorias = async (req, res) => {
+const getProducto = async (req, res) => {
     try {
-        const {categoriaId, activo, incluirCategoria }= req.query;
+        const {subcategoriaId, activo, incluirSubcategoria }= req.query;
         
         // Opciones de consulta
         const opciones = {
@@ -35,60 +35,60 @@ const getSubcategorias = async (req, res) => {
         
         //filtros
         const where  = {};
-        if (categoriaId) where.categoriaId = categoriaId;
+        if (subcategoriaId) where.subcategoriaId = subcategoriaId;
         if (activo !==undefined) where.activo = activo === 'true';
 
         if (Object.keys(where).length > 0){
             opciones.where = where;
         }
 
-        // incluir categoria si se solicita
+        // incluir subcategoria si se solicita
 
-        if (incluirCategoria = 'true'){
+        if (incluirSubcategoria = 'true'){
             opciones.include == [{
-                model: Categoria,
-                as: 'categoria', //campos del alias para la relacion
+                model: Subcategoria,
+                as: 'subcategoria', //campos del alias para la relacion
                 attributes: ['id','nombre', 'activo'] // campos de incluir de la subcategoria
             }]
         }
 
-        //Obtener subcategorias
-        const subcategorias = await Subcategoria.findAll
+        //Obtener productos
+        const productos = await Producto.findAll
         (opciones);
 
         // respuesta exitosa
         res.json({
             success: true,
-            count: subcategorias.length,
+            count: productos.length,
             data:{
-                subcategorias
+                productos
             }
 
         });
     } catch (error){
-        console.error('Error en getSubcategoria', error);
+        console.error('Error en getProducto', error);
         res.status(500).json ({
             success:false,
-            message: 'Error al obtener la Subcategoria',
+            message: 'Error al obtener el Producto',
             error: error.message,
         })
     }
 };
 
 /**
- * obtener todas las subcategorias por id
- * GET/ api/subcategorias/:id
+ * obtener todos los productos por id
+ * GET/ api/productos/:id
  * 
  * @param {Object} req request express
  * @param {Object} res response express
  */
 
-const getSubcategoriasById = async (req, res) => {
+const getProductosById = async (req, res) => {
     try {
         const {id}= req.param;
         
-        // Buscar subcategorias con categoria y contar productos
-        const subcategoria = await Subcategoria.findByPk (id,{
+        // Buscar productos con subcategoria y contar productos
+        const productos = await Producto.findByPk (id,{
             include:[
                 {
                     model:Categoria,
@@ -96,46 +96,45 @@ const getSubcategoriasById = async (req, res) => {
                     attributes: ['id','nombre,', 'activo']
                 },
                 {
-                    model : Producto,
-                    as: 'productos',
+                    model : Subcategoria,
+                    as: 'subcategoria',
                     attributes: ['id']
                 }
             ]
         });
         
-        if (!subcategoria){
+        if (!productos){
             return res.status(404).json({
                 success: false,
-                message: 'Subcategoria no encontrada'
+                message: 'Producto no encontrada'
             });
         }
 
         //agregar contador de productos
-        const subcategoriaJSON = subcategoria.toJSON();
-        subcategoriaJSON.totalProductos = subcategoriaJSON.producto.length;
-        delete subcategoriaJSON.producto;// no enviar la lista completa solo el contador
+        const productosJSON = productos.toJSON();
+        delete productosJSON;// no enviar la lista completa solo el contador
 
         //Respuesta exitosa
         res.json({
             success:true,
             data:{
-                subcategoria: subcategoriaJSON
+                producto: productosJSON
             }
         });
 
     } catch (error){
-        console.error('Error en getSubcategoriaById', error);
+        console.error('Error en getProductosById', error);
         res.status(500).json ({
             success:false,
-            message: 'Error al obtener la Subcategoria',
+            message: 'Error al obtener el producto',
             error: error.message,
         })
     }
 };
 
 /**
- * Crear una categoria
- * POST / api/admin/categoria
+ * Crear un productos
+ * POST / api/admin/producto
  * Body: { nombre,descripcion}
  * @param {Object} req request express
  * @param {Object} res response express
