@@ -163,7 +163,7 @@ Producto.hasMany(DetallePedido, {
 DetallePedido.belongsTo(Producto, {
     foreignKey: 'productoId',//campo conector de las tablas
     as: 'producto', //alias de la relacion
-    onDelete: 'RESTRICT', //no se pede eliminar un producto si esta en un detalle de pedido
+    onDelete: 'RESTRICT', //no se puede eliminar un producto si esta en un detalle de pedido
     onUpdate: 'CASCADE' //si se actualiza un producto se actualiza detalle
 });
 

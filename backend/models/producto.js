@@ -150,7 +150,7 @@ const Producto = sequelize.define('Producto', {
     /**
      * indixces compuestos para optimizar busquedas
      */
-    indixes: [
+    indexes: [
         {
             //Indice para buscar productos por subcategoria
             fields: ['subcategoriaId']
