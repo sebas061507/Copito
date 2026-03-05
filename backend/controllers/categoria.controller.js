@@ -230,7 +230,7 @@ const actualizaCategoria = async (req, res) =>{
         if (activo!==undefined) categoria.activo = activo;
 
         // guardar cambios
-        await Categoria.save();
+        await categoria.save();
 
         // respuesta exitosa
         res.json({
