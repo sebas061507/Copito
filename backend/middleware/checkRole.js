@@ -1,34 +1,33 @@
 /**
  * middleware de verificar roles
- * este middleware verifica que el usuario tenga el rol requerido 
- * debe usarse despues del mddleware de autenticacion
+ * este middleware verifica que el usuario tenga un rol requerido 
+ * debe usuarse despues de middleware de aunteticacion
  */
-
-const esAdmin = async(res, req) => {
-    try{
-        //verificar que existe res.usuario (viene de la autenticacion)
+const esAdmin = (req, res, next) => {
+    try {
+        //verificar que exista re.usuario ( viene de la autenticacion)
         if (!req.usuario) {
             return res.status(401).json({
-                succes: false,
-                message: 'No autorizado, debes iniciar sesion primero'
-            })
-        }
-
-        //verificar que el rol es admin
-        if(req.usuario.rol !== 'administrador'){
-            return res.status(403).json({
                 success: false,
-                message: 'No tienes permiso para acceder a esta ruta, debes ser administrador'
-            })
+                message: 'usuario no auntenticado por favor inicia sesion'
+            });
         }
 
-        //el usuario es admin continuar
+        //verificar que el rol del usuario sea admin
+        if (req.usuario.rol !== 'administrador') {
+            return res.status(401).json({
+                success: false,
+                message: 'Acceso denegado, se requiere rol de administrador'
+            });
+        }
+
+        // el usuario es administrador continuar
         next();
-    }catch (error)  {
-        console.error('Error en middleware esAdmin');
+    } catch (error) {
+        console.error('Error en el mddleware de verificacion de rol de administador', error);
         return res.status(500).json({
             success: false,
-            message: 'Error al verificar permisos',
+            message: 'Error en la verificacion de rol',
             error: error.message
         });
     }
@@ -37,116 +36,191 @@ const esAdmin = async(res, req) => {
 /**
  * middleware para verificar si el usuario es cliente
  */
-
-const esCliente = async(res, req) => {
-    try{
-        //verificar que existe res.usuario (viene de la autenticacion)
+const esCliente = (req, res, next) => {
+    try {
+        //verificar que exista re.usuario ( viene de la autenticacion)
         if (!req.usuario) {
             return res.status(401).json({
-                succes: false,
-                message: 'No autorizado, debes iniciar sesion primero'
-            })
-        }
-
-        //verificar que el rol es admin
-        if(req.usuario.rol !== 'cliente'){
-            return res.status(403).json({
                 success: false,
-                message: 'No tienes permiso para acceder a esta ruta, debes ser cliente'
-            })
+                message: 'usuario no auntenticado por favor inicia sesion'
+            });
         }
 
-        //el usuario es cliente continuar
+        //verificar que el rol del usuario sea cliente
+        if (req.usuario.rol !== 'cliente') {
+            return res.status(401).json({
+                success: false,
+                message: 'Acceso denegado, se requiere rol de cliente'
+            });
+        }
+
+        // el usuario es cliente continuar
         next();
-    }catch (error)  {
-        console.error('Error en middleware esCliente');
+    } catch (error) {
+        console.error('Error en el mddleware de verificacion de rol de cliente', error);
         return res.status(500).json({
             success: false,
-            message: 'Error al verificar permisos',
+            message: 'Error en la verificacion de rol',
             error: error.message
         });
     }
 };
 
 /**
- * middleware flexible para verificar nultiples roles
- * permite especificar varios roles validos 
- * util para cuando una ruta tiene varios roles
+ * middleware flexible para verificar multiples roles
+ * permite verificar varios roles validos 
+ * util para cuando una ruta tiene varios roles permitidos 
  */
-
-const tieneRol = async(res, req, next) => {
+const tieneRol = (req, res, next) => {
     return (req, res, next) => {
-        try{
-            //verificar que existe res.usuario (viene de la autenticacion)
+        try {
+            //verificar que exista re.usuario ( viene de la autenticacion)
             if (!req.usuario) {
                 return res.status(401).json({
-                    succes: false,
-                    message: 'No autorizado, debes iniciar sesion primero'
-                })
-            }
-
-            //verificar usuario este en la lista de roles permitidos
-            if(req.rolesPermitidos.include(req.usuario.rol)){
-                return res.status(403).json({
                     success: false,
-                    message: `Acceso denegado, rse requiere uno de los siguientes roles: ${req.rolesPermitidos.join(', ')}`
-                })
+                    message: 'usuario no auntenticado por favor inicia sesion'
+                });
             }
 
-            //el usuario tiene un rol permitido continuar
+            //verificar que el rol del usuario este en la lista de roles permitida
+            if (!req.rolesPermitidos.include(req.usuario.rol)) {
+                return res.status(401).json({
+                    success: false,
+                    message: `Acceso denegado, se requiere uno de los siguientes roles: ${req.rolesPermitidos.join(', ')}`
+                });
+            }
+
+            // el usuario tiene un rol permitido continuar
             next();
-        }catch (error)  {
-            console.error('Error en middleware tieneRol');
+        } catch (error) {
+            console.error('Error en el mddleware de tiene rol', error);
             return res.status(500).json({
                 success: false,
-                message: 'Error al verificar permisos',
+                message: 'Error en la verificacion de rol no tiene permisos',
                 error: error.message
             });
         }
+    };
+};
+
+/**
+ * middleware para verificar que el usuario accede a sus propios datos
+ * verificar que el usuario ID en los parametros conciden con el usuario autenticado
+ */
+const esPropioUsuarioOAdmin = (req, res, next) => {
+    try {
+            //verificar que exista re.usuario ( viene de la autenticacion)
+            if (!req.usuario) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'usuario no auntenticado por favor inicia sesion'
+                });
+            }
+
+            //los administradores puede acceder a datos de cualquier usuario
+            if (req.usuario.rol === 'administrador') {
+                return next();
+            }
+
+            // Obtener el id del usuarioId de los parametros de la ruta
+            const usuarioIdParam = req.params.usuarioId || req.params.id; 
+
+            //verificar que el usuarioId conciden con el usuario autenticado
+            if (parseInt(usuarioIdParam) !== req.usuario.id) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Acceso denegado no puedes acceder a datos de otros usuarios'
+                });
+            }
+
+            // el usuario accede a sus propios datos continuar
+            next();
+    } catch (error) {
+            console.error('Error en el mddleware esPropioUsuarioOAdmin', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error en la verificacion de permisos',
+                error: error.message
+         });
+     }
+};
+
+/**
+ * middleware para verificar que el usuario es administrador o auxiliar 
+ * permite al acceso a usuarios con el rol administrador o auxiliar 
+ */
+ const esAdminOAuxiliar = (req, res, next) => {
+    try {
+            //verificar que exista req.usuario ( viene de la autenticacion)
+            if (!req.usuario) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'usuario no auntenticado por favor inicia sesion'
+                });
+            }
+
+            //verificar que el usuarioId conciden con el usuario autenticado
+            if (['administrador', 'auxiliar'].includes(req.usuario.rol)) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Acceso denegado se requiere permisos de administrador o auxiliar'
+                });
+            }
+
+            // el usuario es administrador o auxiliar continuar
+            next();
+
+    } catch (error) {
+            console.error('Error en el mddleware esAdminOAuxiliar', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error en la verificacion de permisos',
+                error: error.message
+         });
     }
 };
 
 /**
- * middleware para verificar si el usuario accede a sus propios datos
- * verifica que el usuarioId rn lod parametros coinciden con el usuario autenticado
+ * mddleware para verificar que el usuario es solo adminnistrador no auxiliar
+ * bloquea el acceso a operaciones como eliminar
  */
-
-const esPropioUsuarioOAdmin = async (req, res, next) => {
-    return (req, res, next) => {
-        try{
-            //verificar que existe res.usuario (viene de la autenticacion)
+ const soloAdministrador = (req, res, next) => {
+    try {
+            //verificar que exista req.usuario ( viene de la autenticacion)
             if (!req.usuario) {
                 return res.status(401).json({
-                    succes: false,
-                    message: 'No autorizado, debes iniciar sesion primero'
-                })
+                    success: false,
+                    message: 'usuario no auntenticado por favor inicia sesion'
+                });
             }
 
-            //los admin pueden acceder a los datos de cualquier usuario
-            if(req.usuario.rol === 'administrador'){
-                return next();
-            }
-
-            //obtemer el usuarioId de los parametros de la ruta
-            const usuarioIdParam = req.params.usuarioId || req.params.id;
-
-            //verificar que el 
-            if (parseInt(usuarioIdParam)!==  req.usuario.id){
+            //verificar que el rol sea administrador
+            if (req.usuario.rol !== 'administrador') {
                 return res.status(403).json({
                     success: false,
-                    message: 'Acceso denegado, no puedes acceder a los datos de otros usuarios'
-                })
+                    message: 'Acceso denegado solo administradores puede realizar esta operacion'
+                });
             }
 
-            //el usuario tiene un rol permitido continuar
+            // el usuario es administrador 
             next();
-        }catch (error)  {
-            console.error('Error en middleware tieneRol');
+
+    } catch (error) {
+            console.error('Error en el mddleware soloAdministrador', error);
             return res.status(500).json({
                 success: false,
-                message: 'Error al verificar permisos',
+                message: 'Error en la verificacion de permisos',
                 error: error.message
-            });
-        }
+         });
     }
-}
+};
+
+//Exportar los middlewares
+module.exports = {
+    esAdmin,
+    esCliente,
+    tieneRol,
+    esPropioUsuarioOAdmin,
+    esAdminOAuxiliar,
+    soloAdministrador
+}; 

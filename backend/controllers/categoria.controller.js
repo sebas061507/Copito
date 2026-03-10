@@ -25,7 +25,7 @@ const Producto = require ('../models/producto');
 
 const getCategorias = async (req, res) => {
     try {
-        const {activo, IncluirSubcategorias }= req.query;
+        const {activo, inncluirSubcategorias }= req.query;
         
         // Opciones de consulta
         const opciones = {
@@ -40,7 +40,7 @@ const getCategorias = async (req, res) => {
 
         // incluir Subcategorias si se solicita
 
-        if (IncluirSubcategorias = 'true'){
+        if (incluirSubcategorias = 'true'){
             opciones.include == [{
                 model: Subcategoria,
                 as: 'subcategorias', //campos del alias para la relacion

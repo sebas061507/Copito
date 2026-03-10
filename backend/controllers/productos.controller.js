@@ -363,7 +363,7 @@ const actualizarProducto = async (req, res) =>{
             }
         }
             //validar precio y stock
-            if (precio !== undefined &&parseFloat(precio) < 0){
+            if (precio !== undefined && parseFloat(precio) < 0){
                 return res.status(400).json({
                     success: false,
                     message: 'El precio del producto debe ser mayor a 0'
