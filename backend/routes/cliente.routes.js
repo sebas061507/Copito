@@ -27,7 +27,7 @@ router.get('/catalogo/productos/:id', catalogoController.getProductoById);
 router.get('/catalogo/categorias', catalogoController.getCategorias);
 
 // PUT/ api/catalogo/categoria/:id/subcategorias
-router.get('/catalogo/categoria/:id/subcategorias', catalogoController.getSubcategoriasPorCategorias);
+router.get('/catalogo/categorias/:id/subcategorias', catalogoController.getSubcategoriasPorCategorias);
 
 // PATCH/ api/catalogo/destacados
 router.get('/catalogo/ destacados', catalogoController.getProductosDestacados);

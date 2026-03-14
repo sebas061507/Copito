@@ -115,7 +115,7 @@ const getProductos = async (req, res) => {
 
 const getProductoById = async (req, res) => {
     try {
-        const {id}= req.param;
+        const {id}= req.params;
         
         // Buscar productos con relacion 
         const producto = await Producto.findByPk(id,{
@@ -123,7 +123,7 @@ const getProductoById = async (req, res) => {
                 {
                     model:Categoria,
                     as: 'categoria',
-                    attributes: ['id','nombre,', 'activo']
+                    attributes: ['id','nombre', 'activo']
                 },
                 {
                     model : Subcategoria,
@@ -214,7 +214,7 @@ const crearProducto = async (req, res) =>{
                 message: `La subcategoria con id ${subcategoria.nombre} no esta activa`
             });
         }
-        if (!subcategoria.categoriaId !== parseInt(categoriaId)){
+        if (subcategoria.categoriaId !== parseInt(categoriaId)){
             return res.status(400).json({
                 success:false,
                 message: `La subcategoria ${subcategoria.nombre} no pertenece a la categoria con id ${categoriaId}`
@@ -316,7 +316,7 @@ const crearProducto = async (req, res) =>{
 
 const actualizarProducto = async (req, res) =>{
     try{
-        const{id} = req.param;
+        const{id} = req.params;
         const {nombre,
             descripcion, 
             precio, 

@@ -27,7 +27,7 @@ const Producto = sequelize.define('Producto', {
         type: DataTypes.STRING(200), 
         allowNull: false,
         validate: {
-            notEmpy: {
+            notEmpty: {
                 msg: 'El nombre del producto no puede estar vacio'
             },
             len: {

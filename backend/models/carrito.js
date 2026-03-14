@@ -121,17 +121,17 @@ const Carrito = sequelize.define("carrito",{
        * verifica que la categoria no se cree con el campo "activo" establecido en false, lo que podría causar problemas de integridad de datos si se crean subcategorías o productos asociados a una categoría que ya está desactivada.
        */
       beforeCreate: async (itemcarrito) => {
-        const producto = require("./producto");
+        const Producto = require("./producto");
         //Buscar el producto asociado a este item de carrito para verificar su estado
-        const prducto = await producto.findByPk(itemcarrito.productoId);
+        const producto = await Producto.findByPk(itemcarrito.productoId);
 
-        if (!prducto) {
+        if (!producto) {
           throw new Error(
             "El producto asociado a este item de carrito no existe", //Mensaje de error personalizado si se intenta crear un item de carrito con un producto que no existe
           );
         }
 
-        if (!prducto.activo) {
+        if (!producto.activo) {
           throw new Error(
             "No se puede crear un item de carrito para un producto desactivado", //Mensaje de error personalizado si se intenta crear un item de carrito para un producto que está desactivado
           );
@@ -139,12 +139,12 @@ const Carrito = sequelize.define("carrito",{
 
         if (!producto.hayStock(itemcarrito.cantidad)) {
           throw new Error(
-            `Stock insuficiente, solo hay ${prducto.stock} unidades disponibles`, //Mensaje de error personalizado si se intenta crear un item de carrito con una cantidad que excede el stock disponible del producto
+            `Stock insuficiente, solo hay ${producto.stock} unidades disponibles`, //Mensaje de error personalizado si se intenta crear un item de carrito con una cantidad que excede el stock disponible del producto
           );
         }
 
         //Guardar el precio unitario del producto al momento de agregarlo al carrito para mantener el precio aunque el producto cambie de precio en el futuro
-        itemcarrito.precioUnitario = prducto.precio;
+        itemcarrito.precioUnitario = producto.precio;
       },
       /**
        * beforeUpdate se ejecuta antes de actualizar un carrito, este hook verifica si el campo "activo" ha cambiado a false (desactivado) y si es así, desactiva todas las subcategorías asociadas a esa categoría para mantener la integridad de los datos, esto ayuda a evitar problemas con productos que pertenecen a subcategorías desactivadas.

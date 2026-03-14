@@ -31,7 +31,7 @@ const Usuario = sequelize.define('Usuario', {
         type: DataTypes.STRING(100), 
         allowNull: false,
         validate: {
-            notEmpy: {
+            notEmpty: {
                 msg: 'El nombre no puede estar vacio'
             },
             len: {
@@ -61,7 +61,7 @@ const Usuario = sequelize.define('Usuario', {
         type: DataTypes.STRING(255), //cadena larga para el hash
         allowNull: false,
         validate: {
-            notEmpy: {
+            notEmpty: {
                 msg: 'La contraseña no puede estar vacia'
             },
             len: {

@@ -20,7 +20,7 @@ require('dotenv').config();
 const { testConnection, syncDatabase: syncDataBase } = require('./config/dataBase');
 
 //importar modelos y asociaciones
-const {innitAssociations} = require('./models');
+const { initAssociations } = require('./models');
 
 //importar seeders
 const {runSeeders} = require('./seeders/adminSeeder');
@@ -111,7 +111,10 @@ app.use('/api/admin', adminRoutes);
 //rutas del cliente
 //requieren autenticacion y rol de cliente
 const clienteRoutes = require('./routes/cliente.routes');
-app.use('/api/cliente',clienteRoutes);
+// montar las rutas de cliente en /api para que /api/catalogo/* funcione
+app.use('/api', clienteRoutes);
+// también mantener el prefijo /api/cliente para compatibilidad
+app.use('/api/cliente', clienteRoutes);
 
 //rutas manejo de rutas no encontradas (404)
 
@@ -153,22 +156,24 @@ app.use((err, req, res, next) => {
  * inicia el servidor express
  */
 
-const startServer = async (req, res) => {
+let server;
+
+const startServer = async () => {
     try{
         //paso 1 probar conexiones a MySQL
         console.log('Conectando a MySQL...');
         const dbConnected = await testConnection();
 
         if(!dbConnected) {
-                console.error('No se pudo conectar a MySQL, verificar XAMPP y el archivo .env');
-                process.exit(1);//salir si no hay conexion 
+            console.error('No se pudo conectar a MySQL, verificar XAMPP y el archivo .env');
+            process.exit(1); //salir si no hay conexion 
         }
 
         //paso 2 sincronizar modelos (crear las tablas)
         console.log('Sincronizando modelos con base de datos');
 
         //inicializar asociaciones entre modelos 
-        innitAssociations();
+        initAssociations();
 
         //en desarrollo alter puede ser true para actualizar la estructura 
         //en produccion debe ser false para no perder datos
@@ -177,14 +182,14 @@ const startServer = async (req, res) => {
 
         if(!dbSynced) {
             console.error('No se pudo sincronizar la base de datos');
-            process.exit(1);//salir si no se puede sincronizar
+            process.exit(1); //salir si no se puede sincronizar
         }
 
         //paso 3 ejecutar seeders datos iniciales
         await runSeeders();
 
         //paso 4 iniciar el servidor express
-        app.listen(PORT, () => {
+        server = app.listen(PORT, () => {
             console.log('\n ______________________');
             console.log(`Servidor corriendo en el puerto ${PORT}`);
             console.log(`URL: http://localhost:${PORT}`);
@@ -209,13 +214,20 @@ process.on('SIGINT', () => {
 //capturar errores no manejados
 process.on('unhandledRejection', (err) => {
     console.error('X error no manejado:', err.message);
-    server.close(() => {
+    if (server && typeof server.close === 'function') {
+        server.close(() => {
+            process.exit(1);
+        });
+    } else {
         process.exit(1);
-    });
+    }
 });
 
-//iniciar servidor
-startServer();
+// Iniciar el servidor solo si se ejecuta directamente (no cuando se importa en tests)
+if (require.main === module) {
+    startServer();
+}
 
-//exportar app parta testing
+//exportar app para testing (y opcionalmente permitir iniciar el servidor)
 module.exports = app;
+module.exports.startServer = startServer;

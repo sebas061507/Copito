@@ -25,7 +25,7 @@ const Producto = require ('../models/producto');
 
 const getCategorias = async (req, res) => {
     try {
-        const {activo, inncluirSubcategorias }= req.query;
+        const {activo, incluirSubcategorias }= req.query;
         
         // Opciones de consulta
         const opciones = {
@@ -40,12 +40,12 @@ const getCategorias = async (req, res) => {
 
         // incluir Subcategorias si se solicita
 
-        if (incluirSubcategorias = 'true'){
-            opciones.include == [{
+        if (incluirSubcategorias === 'true'){
+            opciones.include = [{
                 model: Subcategoria,
                 as: 'subcategorias', //campos del alias para la relacion
                 attributes: ['id','nombre','descripcion', 'activo'] // campos de incluir de la subcategoria
-            }]
+            }];
         }
 
         //Obtener categorias
@@ -81,15 +81,15 @@ const getCategorias = async (req, res) => {
 
 const getCategoriasById = async (req, res) => {
     try {
-        const {id}= req.param;
+        const {id}= req.params;
         
         // Buscar categorias con subcategoria y contar productos
         const categoria = await Categoria.findByPk (id,{
             include:[
                 {
                     model:Subcategoria,
-                    as: 'subcategoria',
-                    attributes: ['id','nombre,',
+                    as: 'subcategorias',
+                    attributes: ['id','nombre',
                         'descripcion', 'activo']
                 },
                 {
@@ -109,8 +109,8 @@ const getCategoriasById = async (req, res) => {
 
         //agregar contador de productos
         const categoriaJSON = categoria.toJSON();
-        categoriaJSON.totalProductos = categoriaJSON.producto.length;
-        delete categoriaJSON.producto;// no enviar la lista completa solo el contador
+        categoriaJSON.totalProductos = categoriaJSON.productos ? categoriaJSON.productos.length : 0;
+        delete categoriaJSON.productos; // no enviar la lista completa solo el contador
 
         //Respuesta exitosa
         res.json({
@@ -141,7 +141,7 @@ const getCategoriasById = async (req, res) => {
 const crearCategoria = async (req, res) =>{
     try{
 
-        const {nombre,descripcion} = res.body;
+        const {nombre,descripcion} = req.body;
         if(!nombre) {
             return res.status(400).json({
                 success:false,
@@ -150,7 +150,7 @@ const crearCategoria = async (req, res) =>{
 
         }
         // Validacion 2: categoria duplicada
-        const categoriaExistente = await Categoria.findOne({where: (nombre)});
+        const categoriaExistente = await Categoria.findOne({where: {nombre}});
         if (categoriaExistente){
             return res.status(400).json({
                 success:false,
@@ -200,8 +200,8 @@ const crearCategoria = async (req, res) =>{
 
 const actualizaCategoria = async (req, res) =>{
     try{
-        const{id} = req.param;
-        const {nombre, descripcion} =req.body;
+        const{id} = req.params;
+        const {nombre, descripcion, activo} =req.body;
 
         //buscar categoria
         const categoria = await Categoria.findByPk(id);

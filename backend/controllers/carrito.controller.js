@@ -24,7 +24,7 @@ const getCarrito = async (req, res) => {
             include: [
                 {
                     model: Producto,
-                    as: 'producto',
+                    as: 'productos',
                     attributes: [ 'id', 'nombre', 'descripcion', 'precio', 'stock', 'imagen', 'activo'],
                     include: [
                         {
@@ -40,7 +40,7 @@ const getCarrito = async (req, res) => {
                     ]
                 }
             ],
-            order: (('createAt', 'DESC'))
+            order: [['createdAt', 'DESC']]
         });
 
         //Calcular el total del carrito
@@ -141,12 +141,12 @@ const agregarAlCarrito = async (req, res) => {
             await itemExistente.reload({
                 include: [{
                     model: Producto,
-                    as: 'producto',
+                    as: 'productos',
                     attributes : ['id', 'nombre', 'precio', 'stock', 'imagen']
                 }]
             });
 
-            return req.json({
+            return res.json({
                 success: true,
                 message: 'Cantidad actualizada en el carrito',
                 data: {
@@ -176,7 +176,7 @@ const agregarAlCarrito = async (req, res) => {
         await nuevoItem.reload({
             include: [{
                 model: Producto,
-                as: 'producto',
+                as: 'productos',
                 attributes: ['id', 'nombre', 'precio', 'stock', 'imagen']
             }]
         });
@@ -230,7 +230,7 @@ const actualizarItemCarrito = async (req, res) => {
             },
             include: [{
                 model: Producto,
-                as: 'producto',
+                as: 'productos',
                 attributes: ['id', 'nombre', 'precio', 'stock', 'imagen']
             }]
         });
@@ -301,10 +301,9 @@ const eliminarItemCarrito = async (req, res) => {
         //eliminar
         await item.destroy();
 
-        //respuesta exitosa
         res.json({
-            succes: true,
-            message: 'Item elimindado del carrito exitosamente'
+            success: true,
+            message: 'Item eliminado del carrito exitosamente'
         });
 
     }catch (error){

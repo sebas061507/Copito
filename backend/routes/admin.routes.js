@@ -24,7 +24,7 @@ router.use(verificarAuth, esAdminOAuxiliar);
 
 // Rutas de categorias
 // GET/ api/admin/categorias
-router.get('/catalogo', categoriaController.getCategorias);
+router.get('/categorias', categoriaController.getCategorias);
 
 // GET/ api/admin/categorias/:id
 router.get('/categorias/:id', categoriaController.getCategoriasById);
@@ -33,10 +33,10 @@ router.get('/categorias/:id', categoriaController.getCategoriasById);
 router.get('/categorias/:id/stats', categoriaController.getEstadisticasCategorias);
 
 // POST/ api/admin/categorias
-router.post('/catalogo', categoriaController.crearCategoria);
+router.post('/categorias', categoriaController.crearCategoria);
 
-// PUT/ api/admin/categorias
-router.put('/catalogo', categoriaController.actualizaCategoria);
+// PUT/ api/admin/categorias/:id
+router.put('/categorias/:id', categoriaController.actualizaCategoria);
 
 // PATCH/ api/admin/categorias/:id/toggle desactivar o activar categoria
 router.patch('/categorias/:id/toggle', categoriaController.toggleCategoria);
@@ -81,7 +81,7 @@ router.get('/productos/:id', productoController.getProductoById);
 router.post('/productos', productoController.crearProducto);
 
 // PUT/ api/admin/productos
-router.put('/productos', productoController.actualizarProducto);
+router.put('/productos/:id', productoController.actualizarProducto);
 
 // PATCH/ api/admin/productos/:id/toggle desactivar o activar productos
 router.patch('/productos/:id/toggle', productoController.toggleProducto);

@@ -199,6 +199,11 @@ const initAssociations = () => {
     console.log('Asociaciones entre los modelos establecidas correctamente')
 };
 
+// Exportar la función para que pueda ser usada desde server.js
+module.exports = {
+    initAssociations
+};
+
 //exportar los modelos 
 module.exports = {
     Usuario,

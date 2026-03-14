@@ -44,12 +44,12 @@ const getSubcategorias = async (req, res) => {
 
         // incluir categoria si se solicita
 
-        if (incluirCategoria = 'true'){
-            opciones.include == [{
+        if (incluirCategoria === 'true'){
+            opciones.include = [{
                 model: Categoria,
                 as: 'categoria', //campos del alias para la relacion
                 attributes: ['id','nombre', 'activo'] // campos de incluir de la subcategoria
-            }]
+            }];
         }
 
         //Obtener subcategorias
@@ -85,7 +85,7 @@ const getSubcategorias = async (req, res) => {
 
 const getSubcategoriasById = async (req, res) => {
     try {
-        const {id}= req.param;
+        const {id}= req.params;
         
         // Buscar subcategorias con categoria y contar productos
         const subcategoria = await Subcategoria.findByPk (id,{
@@ -93,7 +93,7 @@ const getSubcategoriasById = async (req, res) => {
                 {
                     model:Categoria,
                     as: 'categoria',
-                    attributes: ['id','nombre,', 'activo']
+                    attributes: ['id','nombre', 'activo']
                 },
                 {
                     model : Producto,
@@ -112,8 +112,8 @@ const getSubcategoriasById = async (req, res) => {
 
         //agregar contador de productos
         const subcategoriaJSON = subcategoria.toJSON();
-        subcategoriaJSON.totalProductos = subcategoriaJSON.producto.length;
-        delete subcategoriaJSON.producto;// no enviar la lista completa solo el contador
+        subcategoriaJSON.totalProductos = subcategoriaJSON.productos ? subcategoriaJSON.productos.length : 0;
+        delete subcategoriaJSON.productos; // no enviar la lista completa solo el contador
 
         //Respuesta exitosa
         res.json({
@@ -143,7 +143,7 @@ const getSubcategoriasById = async (req, res) => {
 
 const crearSubcategoria = async (req, res) =>{
     try{
-        const {nombre,descripcion, categoriaId} = res.body;
+        const {nombre,descripcion, categoriaId} = req.body;
 
         //validacion 1 verificar nombre
         if(!nombre || !categoriaId) {
@@ -203,7 +203,7 @@ const crearSubcategoria = async (req, res) =>{
             success:true,
             message: 'Subcategoria creada exitosamente',
             data:{
-                categoria: subcategoriaConCategoria
+                subcategoria: subcategoriaConCategoria
             }
         });
     } catch (error){

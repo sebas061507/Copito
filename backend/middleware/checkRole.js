@@ -15,7 +15,7 @@ const esAdmin = (req, res, next) => {
 
         //verificar que el rol del usuario sea admin
         if (req.usuario.rol !== 'administrador') {
-            return res.status(401).json({
+            return res.status(403).json({
                 success: false,
                 message: 'Acceso denegado, se requiere rol de administrador'
             });
@@ -48,7 +48,7 @@ const esCliente = (req, res, next) => {
 
         //verificar que el rol del usuario sea cliente
         if (req.usuario.rol !== 'cliente') {
-            return res.status(401).json({
+            return res.status(403).json({
                 success: false,
                 message: 'Acceso denegado, se requiere rol de cliente'
             });
@@ -71,29 +71,29 @@ const esCliente = (req, res, next) => {
  * permite verificar varios roles validos 
  * util para cuando una ruta tiene varios roles permitidos 
  */
-const tieneRol = (req, res, next) => {
+const tieneRol = (rolesPermitidos) => {
     return (req, res, next) => {
         try {
-            //verificar que exista re.usuario ( viene de la autenticacion)
+            //verificar que exista req.usuario ( viene de la autenticacion)
             if (!req.usuario) {
                 return res.status(401).json({
                     success: false,
-                    message: 'usuario no auntenticado por favor inicia sesion'
+                    message: 'Usuario no autenticado por favor inicia sesion'
                 });
             }
 
             //verificar que el rol del usuario este en la lista de roles permitida
-            if (!req.rolesPermitidos.include(req.usuario.rol)) {
-                return res.status(401).json({
+            if (!rolesPermitidos.includes(req.usuario.rol)) {
+                return res.status(403).json({
                     success: false,
-                    message: `Acceso denegado, se requiere uno de los siguientes roles: ${req.rolesPermitidos.join(', ')}`
+                    message: `Acceso denegado, se requiere uno de los siguientes roles: ${rolesPermitidos.join(', ')}`
                 });
             }
 
             // el usuario tiene un rol permitido continuar
             next();
         } catch (error) {
-            console.error('Error en el mddleware de tiene rol', error);
+            console.error('Error en el middleware de tiene rol', error);
             return res.status(500).json({
                 success: false,
                 message: 'Error en la verificacion de rol, no tiene permisos',
@@ -159,11 +159,11 @@ const esPropioUsuarioOAdmin = (req, res, next) => {
                 });
             }
 
-            //verificar que el usuarioId conciden con el usuario autenticado
-            if (['administrador', 'auxiliar'].includes(req.usuario.rol)) {
+            //verificar que el usuario tenga rol administrador o auxiliar
+            if (!['administrador', 'auxiliar'].includes(req.usuario.rol)) {
                 return res.status(403).json({
                     success: false,
-                    message: 'Acceso denegado se requiere permisos de administrador o auxiliar'
+                    message: 'Acceso denegado, se requiere permisos de administrador o auxiliar'
                 });
             }
 

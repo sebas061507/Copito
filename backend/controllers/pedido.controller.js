@@ -59,7 +59,7 @@ const crearPedido = async (req, res) => {
             where: { usuarioId: req.usuario.id },
             include: [{
                     model: Producto,
-                    as: 'producto',
+                    as: 'productos',
                     attributes: ['id', 'nombre', 'precio', 'stock', 'imagen', 'activo'],
             }],
             transaction : t
@@ -78,7 +78,7 @@ const crearPedido = async (req, res) => {
         let totalPedido = 0;
 
         for (const item of itemsCarrito) {
-            const producto = item.producto;
+            const producto = item.productos;
 
             //verificar si el producto esta activo 
             if(!producto.activo) {
@@ -121,7 +121,7 @@ const crearPedido = async (req, res) => {
         const detallesPedido = [];
 
         for (const item of itemsCarrito) {
-            const producto = item.producto;
+            const producto = item.productos;
 
             //crear detalle
             const detalle = await detallePedido.create({
@@ -158,7 +158,7 @@ const crearPedido = async (req, res) => {
                 },
                 {
                     model: detallePedido,
-                    as: 'detalles',
+                    as: 'detallePedidos',
                     include: [{
                         model: Producto,
                         as: 'producto',
@@ -169,7 +169,7 @@ const crearPedido = async (req, res) => {
         });
 
         //respuesta exitosa
-        res.json({
+        res.status(201).json({
             success: true,
             message: 'Pedido creado exitosamente',
             data: {
@@ -213,7 +213,7 @@ const getMisPedidos = async (req,res) => {
             include: [
                 {
                     model: detallePedido,
-                    as: 'detalles',
+                    as: 'detallePedidos',
                     include: [{
                         model: Producto,
                         as: 'producto',
@@ -277,7 +277,7 @@ const getPedidoById =  async (req, res) => {
                 },
                 {
                     model: detallePedido,
-                    as: 'detalles',
+                    as: 'detallePedidos',
                     include: [{
                         model:Producto,
                         as: 'producto',
@@ -345,7 +345,7 @@ const cancelarPedido = async (req, res) => {
             },
             include: [{
                 model: detallePedido,
-                as: 'detalles',
+                as: 'detallePedidos',
                 include: [
                     {
                         model: Producto,
@@ -434,7 +434,7 @@ const getAllPedidos = async (req, res) => {
                 },
                 {
                     model: detallePedido,
-                    as: 'detalles',
+                    as: 'detallePedidos',
                     include: [
                         {
                             model: Producto,
@@ -488,7 +488,7 @@ const actualizarEstadoPedido = async (req, res) => {
         if(!estadosValidos.includes(estado)) {
             return res.status(400).json({
                 success: false,
-                message: `Estado invalido, opciones validas: ${estadosValidos.json(',')}`
+                message: `Estado invalido, opciones validas: ${estadosValidos.join(',')}`
             })
         }
 

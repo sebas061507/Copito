@@ -16,7 +16,7 @@ const Usuario = require('../models/Usuario');
 const verificarAuth = async (req, res, next) => {
     try {
         //Paso 1 obtener el token del header authorization
-        const authHeader = req.header = req.headers.authorization;
+        const authHeader = req.headers.authorization;
 
         if (!authHeader) {
             return res.status(401). json({
@@ -68,8 +68,9 @@ const verificarAuth = async (req, res, next) => {
             });
         }
 
-        //Paso 5 agregar el usuario al objeto de req oara usu posterior 
+        //Paso 5 agregar el usuario al objeto de req para usarlo posteriormente
         // ahora en los controladores podemos acceder a req.usuario
+        req.usuario = usuario;
 
         //continuar con el siguiente
         next();
@@ -108,7 +109,7 @@ const verificarAuthOpcional = async (req, res, next) => {
 
         try {
             const decoded = verifyToken(token);
-            const usuario = await Usuario.findById(decoded.id, {
+            const usuario = await Usuario.findByPk(decoded.id, {
                 attributes: { exclude: ['password']}
             });
 

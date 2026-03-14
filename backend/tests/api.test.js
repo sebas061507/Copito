@@ -101,7 +101,7 @@ describe('🧪 TESTS DE API E-COMMERCE', () => {
       const response = await request(app)
         .post('/api/auth/login')
         .send({
-          email: 'noexiste@test.com',
+          email: 'test@test.com',
           password: 'wrongpass'
         });
       

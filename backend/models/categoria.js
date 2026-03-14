@@ -30,7 +30,7 @@ const Categoria = sequelize.define('Categoria', {
             msg: 'Ya existe una categoria con ese nombre'
         },
         validate: {
-            notEmpy: {
+            notEmpty: {
                 msg: 'El nombre de la categoria no puede estar vacio'
             },
             len: {

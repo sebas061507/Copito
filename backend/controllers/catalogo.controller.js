@@ -179,7 +179,7 @@ const getProductoById = async (req, res) => {
                 {
                     model:Categoria,
                     as: 'categoria',
-                    attributes: ['id','nombre,', 'activo'],
+                    attributes: ['id','nombre', 'activo'],
                     where: {activo:true}
                 },
                 {

@@ -24,12 +24,12 @@ const {generateToken} = require('../config/jwt');
 
 const registrar = async (req, res) => {
     try {
-        const {nombre, apellido, email, password, telefono, direccion}= req.query;
+        const {nombre, apellido, email, password, telefono, direccion}= req.body;
 
         //validacion 1 verificar que todos los campos requerdios esten presentes
         if(!nombre || !apellido || !email || !password){
             return res.status(400).json({
-                succes: false,
+                success: false,
                 message: 'Faltan campos requeridos: nombre, apellido, email y password son obligatorios'
             });
         }
@@ -82,8 +82,8 @@ const registrar = async (req, res) => {
         });
 
         //generar token
-        const token = generarToken({
-            id:nuevoUsuario.id,
+        const token = generateToken({
+            id: nuevoUsuario.id,
             nombre: nuevoUsuario.nombre,
             apellido: nuevoUsuario.apellido,
             email: nuevoUsuario.email,
@@ -153,7 +153,7 @@ const iniciarSesion = async (req, res) =>{
 
         //validacion 4 verificar que la contraseñaa sea correcta
         //usamos el metodo compararPassword del modelo usuario 
-        const passwordCorrecto = await Usuario.compararPassword(password);
+        const passwordCorrecto = await usuarioExistente.compararPassword(password);
 
         if(!passwordCorrecto){
             return res.status(401).json({
@@ -175,7 +175,7 @@ const iniciarSesion = async (req, res) =>{
 
         //respuesta exitosa
         res.json({
-            success: ture,
+            success: true,
             message: 'Inicio de sesion exitoso',
             data: {
                 usuario: usuarioSinPassword,

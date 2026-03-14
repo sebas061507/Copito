@@ -21,7 +21,9 @@ const {verificarAuth} = require('../middleware/auth');
 
 //rutas publicas
 
+// se expone el endpoint en español y en inglés para compatibilidad
 router.post('/registro', registrar);
+router.post('/register', registrar);
 
 router.post('/login', iniciarSesion);
 
